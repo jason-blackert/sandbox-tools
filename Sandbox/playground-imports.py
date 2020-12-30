@@ -3,9 +3,8 @@ import msvcrt
 import time
 import cv2
 import sys
-import os
 
-### MODULES ###
+### IMPORT MODULES ###
 sys.path.insert(0, "imports")
 from dice import Dice
 from timer import Timer
@@ -14,23 +13,22 @@ class Sandbox:
     """ Purpose(s) : [REASON]
         Init Vars  : [VARIABLES]
     """
-    def __init__(self):
+    def __init__(self,
+                 refreshRate = 1.0):
 
-        ### MAIN() ###
-        self.mainState = True
+        ### MAIN ###
         self.mainCounter = 0
-        self.cameraOutput = False
-        self.cameraInit = True
+        self.mainState   = True
 
-        ### END_OF_LOOP() ###
-        self.start_time_live = 0
-        self.end_time_lime   = 0
-        self.target_framerate = 100.0
-        self.target_fps_ms    = (1.0 / self.target_framerate) * 1000
+        ### CAMERA ###
+        self.cameraOutput = False
+        self.cameraInit   = True
 
         ### CLASS INITIALIZATION(S) ###
-        self.dice = Dice()
-        self.timer_main = Timer(timeWindow=1000)
+        self.dice     = Dice()
+        self.target_framerate = refreshRate
+        self.target_fps_ms = (1.0/self.target_framerate)*1000
+        self.timer_ms = Timer(timeWindow = self.target_fps_ms)
 
     def _goodbye(self):
         self.mainState = False
@@ -39,15 +37,13 @@ class Sandbox:
         """ Contains Contents of All Processes Run At the End of Main. """
 
         ### LIVE FRAMERATE ###
-        self.end_time_live = time.time()
-        time_taken = self.end_time_live - self.start_time_live
-        self.start_time_live = self.end_time_live
-
-        self.timer_main.run(current_time=time.time())
-        if self.timer_main.complete():
-            framerate_live = self.target_framerate / (time_taken+1)
-            print("App Refresh Rate: ~{} Hz".format(round(framerate_live, 2)))
-            self.timer_main.start()
+        self.timer_ms.run(current_time=time.time())
+        if self.timer_ms.isComplete():
+            t_end = time.time()
+            t_elapsed = np.round((t_end-self.timer_ms.startTime), 2)
+            t_refresh = np.round((1/t_elapsed), 2)
+            print("| Time Elapsed: {} ms | Refresh Rate {} Hz |".format((1000*t_elapsed), t_refresh))
+            self.timer_ms.start()
 
         ### END OF MAIN LOOP ###
         self.mainCounter+=1
@@ -58,17 +54,13 @@ class Sandbox:
         if msvcrt.kbhit():
             if pressedKey == None:
                 pressedKey = msvcrt.getch()
-            if pressedKey == b'x':
+            if pressedKey == b'x' or pressedKey == b'X':
                 self._goodbye()
-            if pressedKey == b'X':
-                self._goodbye()
-            if pressedKey == b'c':
-                self.cameraOutput = not self.cameraOutput
-            if pressedKey == b'C':
+            if pressedKey == b'c' or pressedKey == b'C':
                 self.cameraOutput = not self.cameraOutput
 
     def main(self):
-        self.timer_main.start()    # MAIN HAS BEGUN
+        self.timer_ms.start()    # MAIN HAS BEGUN
 
         while (self.mainState):
             self._keyboard_input()
@@ -78,7 +70,6 @@ class Sandbox:
             self.camera_input()
 
             self._end_of_loop()
-
 
     def camera_input(self):
         """ A Per-Frame Open-CV Camera Input. """
@@ -99,5 +90,5 @@ class Sandbox:
                 self.cameraInit = True
 
 if __name__ == "__main__":
-    playground = Sandbox()
+    playground = Sandbox(refreshRate=1.0)
     playground.main()
