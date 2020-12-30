@@ -5,7 +5,7 @@ class Timer:
     """
     def __init__(self,
                  startTime=0,  # Will Generally Stay At Zero
-                 timeWindow=500):
+                 timeWindow=1000):
 
         self.StartState      = "START"
         self.InProgressState = "IN-PROGRESS"
@@ -36,14 +36,8 @@ class Timer:
     def start(self):
         self.state = self.StartState
 
-    def complete(self):
+    def isComplete(self):
         if self.state == self.OffState:
-            return True
-        else:
-            return False
-
-    def in_progress(self):
-        if self.state != self.OffState:
             return True
         else:
             return False
@@ -52,14 +46,14 @@ if __name__ == "__main__":
     import time
 
     timer_ms = Timer()
-    timer_ms.set_new_window(500) # ms
+    timer_ms.set_new_window(1000) # ms
     timer_ms.start()
 
     while True:
         timer_ms.run(current_time=time.time())
-        if timer_ms.complete():
+        if timer_ms.isComplete():
             t_end = time.time()
-            print("Time Elapsed: {} ms".format((1000*(t_end-timer_ms.startTime))))
+            t_elapsed = np.round((t_end-timer_ms.startTime), 2)
+            t_refresh = np.round((1/t_elapsed), 2)
+            print("Time Elapsed: {} ms | Refresh Rate {} Hz".format((1000*t_elapsed), t_refresh))
             timer_ms.start()
-
-    time.sleep(5)
