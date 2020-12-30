@@ -25,6 +25,21 @@ class Dice:
         self.current_roll = random.randint(self.min, self.max)
         return self.current_roll
 
+    def walk(self):
+        self.roll()
+
+        if self.current_roll == 6:
+            print("    -------")
+            print("  |         |")
+            print(" |  *     *  |")
+            print("|   *     *   |")
+            print(" |  *     *  |")
+            print("  |         |")
+            print("    -------")
+            print('"So The Dice Walk Helped I See"')
+        else:
+            print("\nNo Luck, You Need To Go For a Dice Walk Man")
+
     def roll_console(self):
         print("\nRolling Dice . . .")
         self.roll()
@@ -81,21 +96,6 @@ class Dice:
 
         print("Roll Received: ", self.current_roll)
         return self.current_roll
-
-    def walk(self):
-        self.roll()
-
-        if self.current_roll == 6:
-            print("    -------")
-            print("  |         |")
-            print(" |  *     *  |")
-            print("|   *     *   |")
-            print(" |  *     *  |")
-            print("  |         |")
-            print("    -------")
-            print('"So The Dice Walk Helped I See"')
-        else:
-            print("\nNo Luck, You Need To Go For a Dice Walk Man")
 
 if __name__ == "__main__":
 
